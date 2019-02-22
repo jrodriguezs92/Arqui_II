@@ -3,7 +3,7 @@ Instituto Tecnológico de Costa Rica
 Ingeniería en Computadores.  
 2019, I Semestre.  
 
-## Prerequisites
+## Prerequisitos
 Sistema operativo GNU/Linux, 64 bits.  
 
 ## Compilación y ejecución
