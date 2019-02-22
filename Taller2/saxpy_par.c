@@ -51,7 +51,7 @@ int main ()
 	/*empezar tiempo */
 	start_time = omp_get_wtime();
 
-    #pragma omp parallel 
+    #pragma omp parallel
     {
         #pragma omp for
         for (int i=0;i<TAM;i++){
