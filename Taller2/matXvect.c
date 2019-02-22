@@ -23,6 +23,9 @@ double start_time, run_time;
 int nthreads = 0;
 //////////////////////////////
 
+/**
+ * Llena el vector con numeros aleatorios.
+ */
 void fill_vector(float * vect)
 {
     srand48(time(NULL));
@@ -36,6 +39,9 @@ void fill_vector(float * vect)
     }
 }
 
+/**
+ * Llena la matriz con numeros aleatorios.
+ */
 void fill_mat(float mat[N][N])
 {
     srand48(time(NULL));
@@ -55,6 +61,10 @@ void fill_mat(float mat[N][N])
     }
 }
 
+/**
+ * Operaciones de producto punto entre matriz y vector.
+ * Para ejecutar con paralelismo: descomentar las lineas 74, 75 y 84.
+ */
 int main ()
 {
     fill_vector(x);
@@ -83,7 +93,7 @@ int main ()
         }
     
     run_time = omp_get_wtime() - start_time;
-	printf("\nLargo de %i \nresultado en %f segundos \nCon %i hilos",N,run_time,nthreads);
+	printf("\nLargo de %i \nresultado en %f segundos \nCon %i hilos\n",N,run_time,nthreads);
 
 	return 0;
 }
