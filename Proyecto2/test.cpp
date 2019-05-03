@@ -4,6 +4,8 @@
 #include <cmath>
 #include <algorithm>
 
+#include "./include/pipeline.h"
+
 using namespace std;
 
 class Comp {
@@ -68,8 +70,8 @@ string decToBin(int dec){
 
 int main() {
 
-    string bin = decToBin(6000);
-    cout << "Dec to Bin: " << bin << endl;
+/*     string bin = decToBin(6000);
+    cout << "Dec to Bin: " << bin << endl; */
 
 
 
