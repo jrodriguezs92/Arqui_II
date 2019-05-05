@@ -18,7 +18,6 @@ namespace arqII
     }
 
     void ID(void) {
-
         // Decodificacion de instruccion
 
         std::string opCode, dstV, op1V, op2V, op1E, inmI, inmLE, op1VR, dstLE;
@@ -51,6 +50,7 @@ namespace arqII
                 idex.control.MuxABancRegV = 0;
                 idex.control.MuxBALU = 0;
                 idex.control.MuxWB = 0;
+                idex.control.ALUCtrl = 0;
 
                 break;
 
@@ -67,6 +67,7 @@ namespace arqII
                 idex.control.MuxABancRegV = 1;
                 idex.control.MuxBALU = 1;
                 idex.control.MuxWB = 0;
+                idex.control.ALUCtrl = 1;
 
                 break;
 
@@ -83,6 +84,7 @@ namespace arqII
                 idex.control.MuxABancRegV = 1;
                 idex.control.MuxBALU = 1;
                 idex.control.MuxWB = 0;
+                idex.control.ALUCtrl = 2;
 
                 break;
 
@@ -99,6 +101,7 @@ namespace arqII
                 idex.control.MuxABancRegV = 0;
                 idex.control.MuxBALU = 0;
                 idex.control.MuxWB = 0;
+                idex.control.ALUCtrl = 3;
 
                 break;
 
@@ -115,6 +118,7 @@ namespace arqII
                 idex.control.MuxABancRegV = 0;
                 idex.control.MuxBALU = 0;
                 idex.control.MuxWB = 0;
+                idex.control.ALUCtrl = 4;
 
                 break;
 
@@ -131,6 +135,7 @@ namespace arqII
                 idex.control.MuxABancRegV = 0;
                 idex.control.MuxBALU = 0;
                 idex.control.MuxWB = 0;
+                idex.control.ALUCtrl = 5;
 
                 break;
 
@@ -147,6 +152,7 @@ namespace arqII
                 idex.control.MuxABancRegV = 0;
                 idex.control.MuxBALU = 0;
                 idex.control.MuxWB = 0;
+                idex.control.ALUCtrl = 6;
 
                 break;
 
@@ -163,6 +169,7 @@ namespace arqII
                 idex.control.MuxABancRegV = 0;
                 idex.control.MuxBALU = -1;
                 idex.control.MuxWB = 1;
+                idex.control.ALUCtrl = -1;
 
                 break;
 
@@ -179,6 +186,7 @@ namespace arqII
                 idex.control.MuxABancRegV = 0;
                 idex.control.MuxBALU = -1;
                 idex.control.MuxWB = -1;
+                idex.control.ALUCtrl = -1;
 
                 break;
 
@@ -195,6 +203,7 @@ namespace arqII
                 idex.control.MuxABancRegV = -1;
                 idex.control.MuxBALU = -1;
                 idex.control.MuxWB = -1;
+                idex.control.ALUCtrl = -1;
 
                 break;
 
@@ -211,6 +220,7 @@ namespace arqII
                 idex.control.MuxABancRegV = 0;
                 idex.control.MuxBALU = 0;
                 idex.control.MuxWB = 0;
+                idex.control.ALUCtrl = 7;
 
                 break;
 
@@ -227,6 +237,7 @@ namespace arqII
                 idex.control.MuxABancRegV = 0;
                 idex.control.MuxBALU = 0;
                 idex.control.MuxWB = 0;
+                idex.control.ALUCtrl = 8;
 
                 break;
 

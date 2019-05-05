@@ -61,6 +61,7 @@ namespace arqII
             short int MuxABancRegV;                         // Senyal de control: MUX a la entrada DirA del banco de registros vectoriales / 0->Inst[11,8], 1->Inst[7,4], -1->Disable
             short int MuxBALU;                              // Senyal de control: MUX a la entrada B de la ALU / 0->Inm[7,0], 1->DOBV, -1->Disable
             short int MuxWB;                                // Senyal de control: MUX en segmento WB / 0->ALUOut, 1->DOAV, -1->Disable
+            short int ALUCtrl;                              // Senyal de control de operaciones de las unidades funcionales /0->XOR, 1->SUMA, 2->RESTA, 3->SHIFT C DER, 4->SHIFT C IZQ, 5->SHIFT DER, 6->SHIFT IZQ, 7->SUMA INM, 8->RESTA INM
         }control;
     };
 
