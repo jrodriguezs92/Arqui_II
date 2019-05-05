@@ -15,17 +15,20 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <cmath>
+#include <thread>
 
 namespace arqII 
 {
 
     // Declaracion de componentes estaticos
 
-    extern std::vector<std::string> memInstr;                       // Memoria de instruciones
-    extern std::vector<std::vector<unsigned short int>> memV;       // Memoria de datos vectoriales
-    extern std::vector<short int> memE;                             // Memoria de datos escalares
-    extern std::vector<std::vector<unsigned short int>> bancRegsV;  // Banco de registros vectoriales
-    extern std::vector<unsigned short int> bancRegsE;               // Banco de registros escalares
+    std::vector<std::string> memInstr;                       // Memoria de instruciones
+    std::vector<std::vector<unsigned short int>> memV;       // Memoria de datos vectoriales
+    std::vector<short int> memE;                             // Memoria de datos escalares
+    std::vector<std::vector<unsigned short int>> bancRegsV;  // Banco de registros vectoriales
+    std::vector<unsigned short int> bancRegsE;               // Banco de registros escalares
 
     // Registros pipeline
 
@@ -33,12 +36,12 @@ namespace arqII
         std::string instruccion;      // Instruccion
     };
 
-    extern struct IFID ifid;
+    struct IFID ifid;
 
 
     struct IDEX {
-        std::vector<std::vector<unsigned short int>> DOAV;  // Dato A de salida del banco de registro vectorial
-        std::vector<std::vector<unsigned short int>> DOBV;  // Dato A de salida del banco de registro vectorial
+        std::vector<unsigned short int> DOAV;  // Dato A de salida del banco de registro vectorial
+        std::vector<unsigned short int> DOBV;  // Dato A de salida del banco de registro vectorial
         unsigned short int DOAE;                            // Dato A de salida del banco de registro escalar
         short int dst1;                                     // Datos dst de [11,8], formatos I y R
         short int dst2;                                     // Datos dst de [11,7], formato LE
@@ -55,19 +58,19 @@ namespace arqII
             unsigned short int MemVRead;                    // Senyal de control: Lectura en memoria vectorial
             unsigned short int MemEWrite;                   // Senyal de control: Escritura en memoria escalar
             unsigned short int MemERead;                    // Senyal de control: Lectura en memoria escalar
-            short int MuxABancRegV;                         // Senyal de control: MUX a la entrada DirA del banco de registros vectoriales
-            short int MuxBALU;                              // Senyal de control: MUX a la entrada B de la ALU
-            short int MuxWB;                                // Senyal de control: MUX en segmento WB
+            short int MuxABancRegV;                         // Senyal de control: MUX a la entrada DirA del banco de registros vectoriales / 0->Inst[11,8], 1->Inst[7,4], -1->Disable
+            short int MuxBALU;                              // Senyal de control: MUX a la entrada B de la ALU / 0->Inm[7,0], 1->DOBV, -1->Disable
+            short int MuxWB;                                // Senyal de control: MUX en segmento WB / 0->ALUOut, 1->DOAV, -1->Disable
         }control;
     };
 
-    extern struct IDEX idex;
+    struct IDEX idex;
 
 
     struct EXMEM {
         std::vector<std::vector<unsigned short int>> ALUOut;    // Dato resultado de unidad Funcional
-        std::vector<std::vector<unsigned short int>> DOAV;      // Dato A de salida del banco de registro vectorial
-        unsigned short int DOAE;                                // Dato A de salida del banco de registro escalar
+        std::vector<std::vector<unsigned short int>> DOAV;      // Dato A de salida de la memoria vectorial
+        unsigned short int DOAE;                                // Dato A de salida de la memoria escalar
         short int dst1;                                         // Datos dst de [11,8], formatos I y R
         short int dst2;                                         // Datos dst de [11,7], formato LE
         short int inm2;                                         // Dato Inm de [6,0], formato LE
@@ -85,7 +88,7 @@ namespace arqII
         }control;
     };
 
-    extern struct EXMEM exmem;
+    struct EXMEM exmem;
 
 
     struct MEMWB {
@@ -104,7 +107,35 @@ namespace arqII
         }control;
     };
 
-    extern struct MEMWB memwb;
+    struct MEMWB memwb;
 
-} //namespaci arquiII
+
+    // Prototipos
+
+    /**
+     * Ejecuta segmento Instruction Fetch
+     */
+    void IF(void);
+    
+    /**
+     * Ejecuta segmento Instruction Decode
+     */ 
+    void ID(void);
+
+    /**
+     * Ejecuta segmento Execute
+     */
+    void EX(void);
+
+    /**
+     * Ejecuta segmento Memmory
+     */
+    void MEM(void);
+
+    /**
+     * Ejecuta segmento Write Back
+     */
+    void WB(void);
+
+} //namespace arquiII
 #endif

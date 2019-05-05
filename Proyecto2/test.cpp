@@ -1,12 +1,11 @@
-#include <iostream>
-#include <vector>
-#include <string>
 #include <cmath>
 #include <algorithm>
 
-#include "./include/pipeline.h"
+#include "./include/pipeline.hpp"
 
 using namespace std;
+
+//vector<string> memInstr;
 
 class Comp {
     private:
@@ -68,7 +67,114 @@ string decToBin(int dec){
     return res;
 }
 
-int main() {
+void* f1() {
+    cout << "Hi from f1!" << endl;
+}
+
+
+
+void* ft1(void* arg) {
+    cout << "executing t1   " << (long) arg << endl;
+
+    pthread_exit(0);
+}
+
+void* ft2(void* arg) {
+    cout << "executing t2" << endl;
+}
+
+void* ft3(void* arg) {
+    cout << "executing t3" << endl;
+}
+
+int main(int argc, char *argv[]) {
+    
+    int a = 5;
+
+    short int b = a;
+
+    cout << "int: " << a << endl << "short: " << b << endl;
+
+
+
+
+
+
+
+
+
+  /*   string bin = "0100";
+
+    int dec = strtol(bin.c_str(), NULL, 2);
+
+    cout << dec << endl; */
+
+
+
+
+
+
+
+
+
+
+    /* pthread_t tid;
+
+    pthread_attr_t attr;
+	pthread_attr_init(&attr);
+
+    pthread_create(&tid, &attr, ft1, (void*) 1);
+
+    pthread_join(tid, NULL); */
+    
+
+   
+    
+
+
+
+
+
+
+
+    /* arqII::memInstr.clear();
+    //memInstr.clear();
+
+    string filename;
+    filename = string(argv[1]);
+
+    ifstream myfile;
+    myfile.open(argv[1]);
+
+    if(myfile.is_open()) {
+        string temp_string;
+        while (getline (myfile,temp_string)) {
+            arqII::memInstr.push_back(temp_string);
+            cout << temp_string << '\n';
+        }
+        cout << arqII::memInstr.size() << endl;
+        myfile.close();
+        int i = 0;
+        while (i<arqII::memInstr.size()){
+            cout << arqII::memInstr.at(i) << endl;
+            i++;
+        }
+    } else {
+        cout << "NO abriio ni picha" << endl;
+    } */
+
+
+
+
+
+
+   /*  thread t1(f1);
+    t1.join(); */
+
+
+
+
+
 
 /*     string bin = decToBin(6000);
     cout << "Dec to Bin: " << bin << endl; */
