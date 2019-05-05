@@ -17,7 +17,7 @@ namespace arqII
         // Llenar memoria de instrucciones
 
         // Limpia vector para memoria de instrucciones
-        arqII::memInstr.clear();
+        memInstr.clear();
 
         // Abre el archivo a ejecutar, con el nombre dado por el argumento argv[1]
         std::ifstream myfile;
@@ -28,7 +28,7 @@ namespace arqII
             std::string temp_string;
             while (getline (myfile,temp_string)) {
                 // Agregar instruccion a la memoria
-                arqII::memInstr.push_back(temp_string);
+                memInstr.push_back(temp_string);
             }
             myfile.close();
         } else {

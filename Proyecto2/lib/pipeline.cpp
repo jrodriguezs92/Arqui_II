@@ -13,7 +13,8 @@
 namespace arqII
 {
 
-    void IF(void) {
+    void IF(short int pc) {
+        ifid.instruccion = memInstr.at(pc);
     }
 
     void ID(void) {

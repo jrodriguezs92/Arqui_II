@@ -42,11 +42,11 @@ namespace arqII
     struct IDEX {
         std::vector<unsigned short int> DOAV;  // Dato A de salida del banco de registro vectorial
         std::vector<unsigned short int> DOBV;  // Dato A de salida del banco de registro vectorial
-        unsigned short int DOAE;                            // Dato A de salida del banco de registro escalar
-        short int dst1;                                     // Datos dst de [11,8], formatos I y R
-        short int dst2;                                     // Datos dst de [11,7], formato LE
-        short int inm1;                                     // Dato Inm de [7,0], formato I
-        short int inm2;                                     // Dato Inm de [6,0], formato LE
+        unsigned short int DOAE;               // Dato A de salida del banco de registro escalar
+        short int dst1;                        // Datos dst de [11,8], formatos I y R
+        short int dst2;                        // Datos dst de [11,7], formato LE
+        short int inm1;                        // Dato Inm de [7,0], formato I
+        short int inm2;                        // Dato Inm de [6,0], formato LE
 
         // Senyales de control
         struct {
@@ -115,7 +115,7 @@ namespace arqII
     /**
      * Ejecuta segmento Instruction Fetch
      */
-    void IF(void);
+    void IF(short int);
     
     /**
      * Ejecuta segmento Instruction Decode

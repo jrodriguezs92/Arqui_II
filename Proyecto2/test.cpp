@@ -89,11 +89,11 @@ void* ft3(void* arg) {
 
 int main(int argc, char *argv[]) {
     
-    int a = 5;
+/*     int a = 5;
 
     short int b = a;
 
-    cout << "int: " << a << endl << "short: " << b << endl;
+    cout << "int: " << a << endl << "short: " << b << endl; */
 
 
 
