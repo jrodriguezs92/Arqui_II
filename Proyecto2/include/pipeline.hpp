@@ -24,11 +24,24 @@ namespace arqII
 
     // Declaracion de componentes estaticos
 
+    static int clk = 0;
     std::vector<std::string> memInstr;                       // Memoria de instruciones
     std::vector<std::vector<unsigned short int>> memV;       // Memoria de datos vectoriales
     std::vector<short int> memE;                             // Memoria de datos escalares
     std::vector<std::vector<unsigned short int>> bancRegsV;  // Banco de registros vectoriales
     std::vector<unsigned short int> bancRegsE;               // Banco de registros escalares
+    static bool isInstrOcupada = false;                      // Controla paso de instrucciones, para evitar conflictos
+    //static bool isIFFull = false;
+    //static bool isIDFull = false;
+
+    // Estructura para parametros de los hilos de EX
+    struct EXThreadStruct {
+        std::vector<unsigned short int> parAV;
+        std::vector<unsigned short int> parBV;
+        short int parInm;
+        std::vector<unsigned short int> resultado;
+        short int op;
+    };
 
     // Registros pipeline
 
@@ -65,12 +78,12 @@ namespace arqII
         }control;
     };
 
-    struct IDEX idex;
+    struct IDEX idex, idextmp;
 
 
     struct EXMEM {
-        std::vector<std::vector<unsigned short int>> ALUOut;    // Dato resultado de unidad Funcional
-        std::vector<std::vector<unsigned short int>> DOAV;      // Dato A de salida de la memoria vectorial
+        std::vector<unsigned short int> ALUOut;                 // Dato resultado de unidad Funcional
+        std::vector<unsigned short int> DOAV;                   // Dato A de salida de la memoria vectorial
         unsigned short int DOAE;                                // Dato A de salida de la memoria escalar
         short int dst1;                                         // Datos dst de [11,8], formatos I y R
         short int dst2;                                         // Datos dst de [11,7], formato LE
@@ -86,6 +99,7 @@ namespace arqII
             unsigned short int MemVRead;                    // Senyal de control: Lectura en memoria vectorial
             unsigned short int MemEWrite;                   // Senyal de control: Escritura en memoria escalar
             unsigned short int MemERead;                    // Senyal de control: Lectura en memoria escalar
+            short int MuxWB;                                // Senyal de control: MUX en segmento WB / 0->ALUOut, 1->DOAV, -1->Disable
         }control;
     };
 
@@ -137,6 +151,13 @@ namespace arqII
      * Ejecuta segmento Write Back
      */
     void WB(void);
+
+    // Funciones complementarias
+
+    /**
+     * Ejecucion de lane
+     */
+    void* runLane (void*);
 
 } //namespace arquiII
 #endif

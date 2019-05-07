@@ -14,10 +14,20 @@ namespace arqII
 {
 
     void IF(short int pc) {
+        //while (isIFFull) {}
+        //isIFFull = true;
+        while (isInstrOcupada) {}
         ifid.instruccion = memInstr.at(pc);
+        
+        // Desactiva paso a la nueva instruccion, para evitar conflictos
+        isInstrOcupada = true;
     }
 
     void ID(void) {
+        //while(isIDFull) {}
+
+        //isIDFull = true;
+
         // Decodificacion de instruccion
 
         std::string opCode, dstV, op1V, op2V, op1E, inmI, inmLE, op1VR, dstLE;
@@ -30,6 +40,9 @@ namespace arqII
         inmI.assign(ifid.instruccion, 8, 8);                            // inmI = Inst[7,0]
         inmLE.assign(ifid.instruccion, 9, 7);                           // inmLE = Inst[6,0]
         dstLE.assign(ifid.instruccion, 4, 5);                           // dstLE = Inst[11,7]
+
+        // Activa paso a la nueva instruccion
+        isInstrOcupada = false;
 
         // Unidad de control
 
@@ -280,14 +293,308 @@ namespace arqII
         idex.dst2 = dst2;
         idex.inm1 = inm1;
         idex.inm2 = inm2;
+
+        //isIDFull = false;
     }
 
     void EX(void) {
+        if (idex.control.ALUCtrl != -1) {
+            // Definir variables para almacenar datos del pipe anterior
+            short int ALUBopInm;                        // Operando Inmediato de entrada a unidades funcionales
+            std::vector<unsigned short int> ALUAop;     // Operando vector de entrada a unidades funcionales
+            std::vector<unsigned short int> ALUBop;     // Operando vector de entrada a unidades funcionales
+
+            // Definir vectores para separar ejecucion
+            std::vector<unsigned short int> lane1AOp;   // Vector de entrada para lane 1
+            std::vector<unsigned short int> lane2AOp;   // Vector de entrada para lane 2
+            std::vector<unsigned short int> lane3AOp;   // Vector de entrada para lane 3
+            std::vector<unsigned short int> lane4AOp;   // Vector de entrada para lane 4
+
+            // Asignar datos y senyales desde pipe anterior
+            ALUAop = idex.DOAV;
+            ALUBop = idex.DOBV;
+            ALUBopInm = idex.inm1;
+
+            // Flujo de datos hacia el proximo pipe
+            exmem.DOAV = idex.DOAV;
+            exmem.DOAE = idex.DOAE;
+            exmem.dst1 = idex.dst1;
+            exmem.dst2 = idex.dst2;
+            exmem.inm2 = idex.inm2;
+
+            // Separar ejecucion por lanes equitativamente
+            int j = 1;
+            for (int i=0; i<ALUAop.size(); i++) {
+                if (j == 1) {
+                    lane1AOp.push_back(ALUAop.at(i));
+                    j++;
+                }
+                else if (j == 2) {
+                    lane2AOp.push_back(ALUAop.at(i));
+                    j++;
+                }
+                else if (j == 3) {
+                    lane3AOp.push_back(ALUAop.at(i));
+                    j++;
+                }
+                else if (j == 4) {
+                    lane4AOp.push_back(ALUAop.at(i));
+                    j = 1;
+                }
+            }
+
+            // Calcular numero de hilos para concurrencia
+            int numThreads = 4;
+            if (ALUAop.size() < 4) {
+                numThreads = ALUAop.size();
+            }
+            
+            // Creacion de estructuras con datos para hilos
+            struct EXThreadStruct args[numThreads];
+            pthread_t tids[numThreads];
+
+            // Vector de resultado final
+            std::vector<unsigned short int> resultadoEX;
+
+            // Ejecucion para operaciones vector-escalar
+            if (idex.control.MuxBALU == 0) {
+                for (int i=0; i<numThreads; i++) {
+                    args[i].parInm = ALUBopInm;
+                    args[i].op = idex.control.ALUCtrl;
+                    if (i==0){
+                        args[i].parAV = lane1AOp;
+                    }
+                    else if (i==1){
+                        args[i].parAV = lane2AOp;
+                    }
+                    else if (i==2){
+                        args[i].parAV = lane3AOp;
+                    }
+                    else if (i==3){
+                        args[i].parAV = lane4AOp;
+                    }
+
+                    pthread_attr_t attr;
+	                pthread_attr_init(&attr);
+                    pthread_create(&tids[i], &attr, runLane, &args[i]);
+                }
+
+                // Esperar a que los hilos terminen de ejecutar los lane
+                for (int i = 0; i < numThreads; i++) {
+                    pthread_join(tids[i], NULL);
+
+                    // Unir resultados
+                    for (int index=0; index<args[i].resultado.size(); index++){
+                        resultadoEX.push_back(args[i].resultado.at(index));
+                    }
+                }
+            }
+            // Ejecucion para operaciones vector-vector
+            else if (idex.control.MuxBALU == 1) {
+                // Si el vector operador no es de tamanyo completo, entonces, ajustar tamanyo de vector operador B
+                std::vector<unsigned short int> ALUBopTmp;
+                if (ALUAop.size() < 8) {
+                    for (int i=0; i<ALUAop.size(); i++) {
+                        ALUBopTmp.push_back(ALUBop.at(i));
+                    }
+                }
+
+                // Definir vectores para separar ejecucion
+                std::vector<unsigned short int> lane1BOp;   // Vector de entrada para lane 1
+                std::vector<unsigned short int> lane2BOp;   // Vector de entrada para lane 2
+                std::vector<unsigned short int> lane3BOp;   // Vector de entrada para lane 3
+                std::vector<unsigned short int> lane4BOp;   // Vector de entrada para lane 4
+
+                // Separar ejecucion por lanes equitativamente
+                int j = 1;
+                for (int i=0; i<ALUBopTmp.size(); i++) {
+                    if (j == 1) {
+                        lane1BOp.push_back(ALUBopTmp.at(i));
+                        j++;
+                    }
+                    else if (j == 2) {
+                        lane2BOp.push_back(ALUBopTmp.at(i));
+                        j++;
+                    }
+                    else if (j == 3) {
+                        lane3BOp.push_back(ALUBopTmp.at(i));
+                        j++;
+                    }
+                    else if (j == 4) {
+                        lane4BOp.push_back(ALUBopTmp.at(i));
+                        j = 1;
+                    }
+                }
+
+                for (int i=0; i<numThreads; i++) {
+                    args[i].op = idex.control.ALUCtrl;
+                    if (i==0){
+                        args[i].parAV = lane1AOp;
+                        args[i].parBV = lane1BOp;
+                    }
+                    else if (i==1){
+                        args[i].parAV = lane2AOp;
+                        args[i].parBV = lane2BOp;
+                    }
+                    else if (i==2){
+                        args[i].parAV = lane3AOp;
+                        args[i].parBV = lane3BOp;
+                    }
+                    else if (i==3){
+                        args[i].parAV = lane4AOp;
+                        args[i].parBV = lane4BOp;
+                    }
+
+                    pthread_attr_t attr;
+	                pthread_attr_init(&attr);
+                    pthread_create(&tids[i], &attr, runLane, &args[i]);
+                }
+
+                // Esperar a que los hilos terminen de ejecutar los lane
+                for (int i = 0; i < numThreads; i++) {
+                    pthread_join(tids[i], NULL);
+
+                    // Unir resultados
+                    for (int index=0; index<args[i].resultado.size(); index++){
+                        resultadoEX.push_back(args[i].resultado.at(index));
+                    }
+                }
+            }
+
+            // Flujo de senyales
+            exmem.ALUOut = resultadoEX;
+            exmem.control.RegVWrite = idex.control.RegVWrite;
+            exmem.control.RegVRead = idex.control.RegVRead;
+            exmem.control.RegEWrite = idex.control.RegEWrite;
+            exmem.control.RegERead = idex.control.RegERead;
+            exmem.control.MemVWrite = idex.control.MemVWrite;
+            exmem.control.MemVRead = idex.control.MemVRead;
+            exmem.control.MemEWrite = idex.control.MemEWrite;
+            exmem.control.MemERead = idex.control.MemERead;
+            exmem.control.MuxWB = idex.control.MuxWB;
+        }
     }
     
     void MEM(void) {
     }
 
     void WB(void) {
+    }
+
+
+    // Funciones complementarias
+
+    void* runLane (void* arg) {
+        struct EXThreadStruct *arg_struct = (struct EXThreadStruct*) arg;
+
+        std::vector<unsigned short int> res;
+        switch (arg_struct->op) {
+            unsigned short int resultadoTmp;
+            // XOR
+            case 0:
+                for (int i=0; i<arg_struct->parAV.size(); i++) {
+                    resultadoTmp = (arg_struct->parAV.at(i)) ^ (arg_struct->parInm);
+                    res.push_back(resultadoTmp);
+                }
+
+                break;
+            
+            // SUMA
+            case 1:
+                for (int i=0; i<arg_struct->parAV.size(); i++) {
+                    if (((arg_struct->parAV.at(i)) + (arg_struct->parBV.at(i))) > 255) {
+                        resultadoTmp = arg_struct->parAV.at(i);
+                        for (int j = arg_struct->parInm; j>0; j--) {
+                            if ((resultadoTmp+1) > 255) {
+                                resultadoTmp = 0;
+                            }
+                            else {
+                                resultadoTmp++;
+                            }
+                        }
+                    }
+                    else {
+                        resultadoTmp = (arg_struct->parAV.at(i)) + (arg_struct->parBV.at[i]);
+                    }
+                    res.push_back(resultadoTmp);
+                }
+
+                break;
+
+            // RESTA
+            case 2:
+                for (int i=0; i<arg_struct->parAV.size(); i++) {
+                    if (((arg_struct->parAV.at(i)) - (arg_struct->parBV.at(i))) < 0) {
+                        resultadoTmp = arg_struct->parAV.at(i);
+                        for (int j = arg_struct->parInm; j>0; j--) {
+                            if ((resultadoTmp-1) < 0) {
+                                resultadoTmp = 255;
+                            }
+                            else {
+                                resultadoTmp--;
+                            }
+                        }
+                    }
+                    else {
+                        resultadoTmp = (arg_struct->parAV.at(i)) - (arg_struct->parBV.at[i]);
+                    }
+                    res.push_back(resultadoTmp);
+                }
+
+                break;
+
+            // SHIFT CIRC DER
+            case 3:
+
+
+                break;
+
+            // SHIFT CIRC IZQ
+            case 4:
+
+                break;
+
+            // SHIFT DER
+            case 5:
+                for (int i=0; i<arg_struct->parAV.size(); i++) {
+                    unsigned char opTmp = (unsigned char) (arg_struct->parAV.at(i));
+                    unsigned char shNum = opTmp >> (arg_struct->parInm);
+                    resultadoTmp = (unsigned short int) (shNum);
+                }
+
+                break;
+
+            // SHIFT IZQ
+            case 6:
+                for (int i=0; i<arg_struct->parAV.size(); i++) {
+                    unsigned char opTmp = (unsigned char) (arg_struct->parAV.at(i));
+                    unsigned char shNum = opTmp << (arg_struct->parInm);
+                    resultadoTmp = (unsigned short int) (shNum);
+                }
+
+                break;
+
+            // SUMA INM
+            case 7:
+                for (int i=0; i<arg_struct->parAV.size(); i++) {
+                    resultadoTmp = (arg_struct->parAV.at(i)) + (arg_struct->parInm);
+                    res.push_back(resultadoTmp);
+                }
+
+                break;
+
+            // RESTA INM
+            case 8:
+                for (int i=0; i<arg_struct->parAV.size(); i++) {
+                    resultadoTmp = (arg_struct->parAV.at(i)) - (arg_struct->parInm);
+                    res.push_back(resultadoTmp);
+                }
+
+                break;
+        }
+
+        arg_struct->resultado = res;
+
+        pthread_exit(0);
     }
 } //namespace arqII

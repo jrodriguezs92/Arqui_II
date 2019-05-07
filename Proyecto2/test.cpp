@@ -1,5 +1,7 @@
 #include <cmath>
 #include <algorithm>
+#include <cstdint>
+#include <cstdint>
 
 #include "./include/pipeline.hpp"
 
@@ -71,10 +73,14 @@ void* f1() {
     cout << "Hi from f1!" << endl;
 }
 
-
-
 void* ft1(void* arg) {
-    cout << "executing t1   " << (long) arg << endl;
+    int sum = 0;
+
+    for (int i = 0; i<20; i++) {
+        sum++;
+    }
+
+    cout << "SUM from " << (intptr_t) arg << "is " << sum << endl;
 
     pthread_exit(0);
 }
@@ -87,7 +93,187 @@ void* ft3(void* arg) {
     cout << "executing t3" << endl;
 }
 
+
+// circular bit shift left of integer 'number' by 'n' bit positions
+template < typename T > T circular_shift_left( T number, std::size_t n )
+{
+    static_assert( std::is_integral<T>::value, "an integral type is required" ) ;
+
+    // the corresponding unsigned type if T is a signed integer, T itself otherwise
+    using unsigned_type = std::make_unsigned_t<T> ;
+
+    // number of bits in the integral type
+    constexpr std::size_t NBITS = 8;
+
+    n %= NBITS ; // bring the number of bit positions to shift by to within a valid range
+    const unsigned_type un = number ; // the number interpreted as an unsigned value
+
+    // circular bit shift left of an unsigned NBITS-bit integer by n bit positions
+    return ( un << n ) | ( un >> (NBITS-n) ) ;
+}
+
+
 int main(int argc, char *argv[]) {
+
+    unsigned short int z = 255;
+
+    unsigned char a = (unsigned char) z;
+
+    unsigned char b = a << 3;
+
+    unsigned short int c = (unsigned short int) b;
+
+    cout << c << endl;
+
+
+
+
+
+
+
+
+/* 
+    unsigned short int num = 254;
+    string numS = to_string(num);
+
+    
+
+    cout << numS << endl << numH << endl; */
+    
+    /* unsigned char x =0x7F;
+    cout << " Original: " << (int) x << endl;
+    x = ( x << 1 ) + ( x >> 7 );                                                                                   
+    cout << " Final:    " << (int) x << endl; */
+
+    
+
+
+
+
+
+
+
+
+/* 
+    int x = 12;     // binary: 1100
+    int y = 10;     // binary: 1010
+    int z = x ^ y;  // binary: 0110, or decimal 6
+    int r = z ^ y;  // binary: 1100, or decimal 12
+
+    cout << "XOR1: " << z << endl;
+    cout << "XOR2: " << r << endl; */
+
+
+
+
+
+
+
+
+
+
+/*     std::vector<unsigned short int> ALUAop;
+    ALUAop.push_back(1);
+    ALUAop.push_back(2);
+    ALUAop.push_back(3);
+
+    std::vector<unsigned short int> lane1AOp;
+    std::vector<unsigned short int> lane2AOp;
+    std::vector<unsigned short int> lane3AOp;
+    std::vector<unsigned short int> lane4AOp;
+
+    int j = 1;
+    for (int i=0; i<ALUAop.size(); i++) {
+        if (j == 1) {
+            lane1AOp.push_back(ALUAop.at(i));
+            j++;
+        }
+        else if (j == 2) {
+            lane2AOp.push_back(ALUAop.at(i));
+            j++;
+        }
+        else if (j == 3) {
+            lane3AOp.push_back(ALUAop.at(i));
+            j++;
+        }
+        else if (j == 4) {
+            lane4AOp.push_back(ALUAop.at(i));
+            j = 1;
+        }
+    }
+
+    cout << "lane 1 : " << endl;
+
+    for (int i=0; i<lane1AOp.size(); i++) {
+        cout << lane1AOp.at(i) << "     ";
+    }
+    cout << endl;
+
+    cout << "lane 2 : " << endl;
+
+    for (int i=0; i<lane2AOp.size(); i++) {
+        cout << lane2AOp.at(i) << "     ";
+    }
+    cout << endl;
+
+    cout << "lane 3 : " << endl;
+
+    for (int i=0; i<lane3AOp.size(); i++) {
+        cout << lane3AOp.at(i) << "     ";
+    }
+    cout << endl;
+
+    cout << "lane 4 : " << endl;
+
+    for (int i=0; i<lane4AOp.size(); i++) {
+        cout << lane4AOp.at(i) << "     ";
+    }
+    cout << endl; */
+
+
+
+
+
+
+
+
+
+
+/* 
+    std::vector<unsigned short int> VA;
+    VA.push_back(1);
+
+    if (VA.size() == 0) {
+        cout << "VECTOR NULO" << endl;
+    } */
+
+
+
+
+
+
+
+
+
+/* 
+    clock_t start, end;
+
+    start = clock();
+
+    for (int i=0; i<10000; i++) {}
+
+    end = clock();
+
+    clock_t total = end - start;
+
+    cout << "clock ticks total " << total << endl; */
+
+
+
+
+
+
+
     
 /*     int a = 5;
 
@@ -117,15 +303,18 @@ int main(int argc, char *argv[]) {
 
 
 
-
-    /* pthread_t tid;
+/* 
+    pthread_t tid1;
+    pthread_t tid2;
 
     pthread_attr_t attr;
 	pthread_attr_init(&attr);
 
-    pthread_create(&tid, &attr, ft1, (void*) 1);
+    pthread_create(&tid1, &attr, ft1, (void*) 1);
+    pthread_create(&tid2, &attr, ft1, (void*) 2);
 
-    pthread_join(tid, NULL); */
+    pthread_join(tid1, NULL);
+    pthread_join(tid2, NULL); */
     
 
    
