@@ -30,9 +30,10 @@ namespace arqII
     std::vector<short int> memE;                             // Memoria de datos escalares
     std::vector<std::vector<unsigned short int>> bancRegsV;  // Banco de registros vectoriales
     std::vector<unsigned short int> bancRegsE;               // Banco de registros escalares
-    static bool isInstrOcupada = false;                      // Controla paso de instrucciones, para evitar conflictos
-    //static bool isIFFull = false;
-    //static bool isIDFull = false;
+    static bool isIFIDOcupado = false;                       // Evita sobreescritura sobre pipe IFID
+    static bool isIDEXOcupado = false;                       // Evita sobreescritura sobre pipe IDEX
+    static bool isEXMEMOcupado = false;                      // Evita sobreescritura sobre pipe EXMEM
+    static bool isMEMWBOcupado = false;                      // Evita sobreescritura sobre pipe MEMWB
 
     // Estructura para parametros de los hilos de EX
     struct EXThreadStruct {
@@ -92,9 +93,7 @@ namespace arqII
         // Senyales de control
         struct {
             unsigned short int RegVWrite;                   // Senyal de control: Escritura en banco de registros vectorial
-            unsigned short int RegVRead;                    // Senyal de control: Lectura en banco de registros vectorial
             unsigned short int RegEWrite;                   // Senyal de control: Escritura en banco de registros escalar
-            unsigned short int RegERead;                    // Senyal de control: Lectura en banco de registros vectorial
             unsigned short int MemVWrite;                   // Senyal de control: Escritura en memoria vectorial
             unsigned short int MemVRead;                    // Senyal de control: Lectura en memoria vectorial
             unsigned short int MemEWrite;                   // Senyal de control: Escritura en memoria escalar
@@ -107,8 +106,8 @@ namespace arqII
 
 
     struct MEMWB {
-        std::vector<std::vector<unsigned short int>> ALUOut;    // Dato resultado de unidad Funcional
-        std::vector<std::vector<unsigned short int>> DOMemV;    // Dato de salida la memoria vectorial
+        std::vector<unsigned short int> ALUOut;                 // Dato resultado de unidad Funcional
+        std::vector<unsigned short int> DOMemV;                 // Dato de salida la memoria vectorial
         unsigned short int DOMemE;                              // Dato de salida la memoria escalar
         short int dst1;                                         // Datos dst de [11,8], formatos I y R
         short int dst2;                                         // Datos dst de [11,7], formato LE
@@ -116,9 +115,8 @@ namespace arqII
         // Senyales de control
         struct {
             unsigned short int RegVWrite;                       // Senyal de control: Escritura en banco de registros vectorial
-            unsigned short int RegVRead;                        // Senyal de control: Lectura en banco de registros vectorial
             unsigned short int RegEWrite;                       // Senyal de control: Escritura en banco de registros escalar
-            unsigned short int RegERead;                        // Senyal de control: Lectura en banco de registros vectorial
+            short int MuxWB;                                    // Senyal de control: MUX en segmento WB / 0->ALUOut, 1->DOAV, -1->Disable
         }control;
     };
 
@@ -130,27 +128,27 @@ namespace arqII
     /**
      * Ejecuta segmento Instruction Fetch
      */
-    void IF(short int);
+    void IF (short int);
     
     /**
      * Ejecuta segmento Instruction Decode
      */ 
-    void ID(void);
+    void ID (void);
 
     /**
      * Ejecuta segmento Execute
      */
-    void EX(void);
+    void EX (void);
 
     /**
      * Ejecuta segmento Memmory
      */
-    void MEM(void);
+    void MEM (void);
 
     /**
      * Ejecuta segmento Write Back
      */
-    void WB(void);
+    void WB (void);
 
     // Funciones complementarias
 

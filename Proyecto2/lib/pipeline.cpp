@@ -14,20 +14,14 @@ namespace arqII
 {
 
     void IF(short int pc) {
-        //while (isIFFull) {}
-        //isIFFull = true;
-        while (isInstrOcupada) {}
+        while (isIFIDOcupado) {}
         ifid.instruccion = memInstr.at(pc);
         
         // Desactiva paso a la nueva instruccion, para evitar conflictos
-        isInstrOcupada = true;
+        isIFIDOcupado = true;
     }
 
     void ID(void) {
-        //while(isIDFull) {}
-
-        //isIDFull = true;
-
         // Decodificacion de instruccion
 
         std::string opCode, dstV, op1V, op2V, op1E, inmI, inmLE, op1VR, dstLE;
@@ -42,12 +36,14 @@ namespace arqII
         dstLE.assign(ifid.instruccion, 4, 5);                           // dstLE = Inst[11,7]
 
         // Activa paso a la nueva instruccion
-        isInstrOcupada = false;
+        isIFIDOcupado = false;
 
         // Unidad de control
 
         // Convertir opCode a decimal para manipular con case,switch
         int decOpCode = strtol(opCode.c_str(), NULL, 2);
+
+        while (isIDEXOcupado) {}
 
         switch(decOpCode) {
             // XOR
@@ -294,33 +290,53 @@ namespace arqII
         idex.inm1 = inm1;
         idex.inm2 = inm2;
 
-        //isIDFull = false;
+        isIDEXOcupado = true;
     }
 
     void EX(void) {
-        if (idex.control.ALUCtrl != -1) {
-            // Definir variables para almacenar datos del pipe anterior
-            short int ALUBopInm;                        // Operando Inmediato de entrada a unidades funcionales
-            std::vector<unsigned short int> ALUAop;     // Operando vector de entrada a unidades funcionales
-            std::vector<unsigned short int> ALUBop;     // Operando vector de entrada a unidades funcionales
+        // Definir variables para almacenar datos del pipe anterior
+        // Datos
+        short int ALUBopInm;                        // Operando Inmediato de entrada a unidades funcionales
+        std::vector<unsigned short int> ALUAop;     // Operando vector de entrada a unidades funcionales
+        std::vector<unsigned short int> ALUBop;     // Operando vector de entrada a unidades funcionales
+        // Senyales de Control
+        short int MuxBALU, MuxWB, ALUCtrl;
 
+        // Flujo de datos hacia el proximo pipe
+        //Datos
+        exmem.DOAV = idex.DOAV;
+        exmem.DOAE = idex.DOAE;
+        exmem.dst1 = idex.dst1;
+        exmem.dst2 = idex.dst2;
+        exmem.inm2 = idex.inm2;
+        // Control
+        exmem.control.RegVWrite = idex.control.RegVWrite;
+        exmem.control.RegEWrite = idex.control.RegEWrite;
+        exmem.control.MemVWrite = idex.control.MemVWrite;
+        exmem.control.MemVRead = idex.control.MemVRead;
+        exmem.control.MemEWrite = idex.control.MemEWrite;
+        exmem.control.MemERead = idex.control.MemERead;
+        exmem.control.MuxWB = idex.control.MuxWB;
+
+        // Asignar datos y senyales desde pipe anterior
+        // Datos
+        ALUAop = idex.DOAV;
+        ALUBop = idex.DOBV;
+        ALUBopInm = idex.inm1;
+        // Senyales de control
+        MuxBALU = idex.control.MuxBALU;
+        ALUCtrl = idex.control.ALUCtrl;
+
+        isIDEXOcupado = false;
+
+        while (isEXMEMOcupado) {}
+        
+        if (ALUCtrl != -1) {
             // Definir vectores para separar ejecucion
             std::vector<unsigned short int> lane1AOp;   // Vector de entrada para lane 1
             std::vector<unsigned short int> lane2AOp;   // Vector de entrada para lane 2
             std::vector<unsigned short int> lane3AOp;   // Vector de entrada para lane 3
             std::vector<unsigned short int> lane4AOp;   // Vector de entrada para lane 4
-
-            // Asignar datos y senyales desde pipe anterior
-            ALUAop = idex.DOAV;
-            ALUBop = idex.DOBV;
-            ALUBopInm = idex.inm1;
-
-            // Flujo de datos hacia el proximo pipe
-            exmem.DOAV = idex.DOAV;
-            exmem.DOAE = idex.DOAE;
-            exmem.dst1 = idex.dst1;
-            exmem.dst2 = idex.dst2;
-            exmem.inm2 = idex.inm2;
 
             // Separar ejecucion por lanes equitativamente
             int j = 1;
@@ -357,10 +373,10 @@ namespace arqII
             std::vector<unsigned short int> resultadoEX;
 
             // Ejecucion para operaciones vector-escalar
-            if (idex.control.MuxBALU == 0) {
+            if (MuxBALU == 0) {
                 for (int i=0; i<numThreads; i++) {
                     args[i].parInm = ALUBopInm;
-                    args[i].op = idex.control.ALUCtrl;
+                    args[i].op = ALUCtrl;
                     if (i==0){
                         args[i].parAV = lane1AOp;
                     }
@@ -390,7 +406,7 @@ namespace arqII
                 }
             }
             // Ejecucion para operaciones vector-vector
-            else if (idex.control.MuxBALU == 1) {
+            else if (MuxBALU == 1) {
                 // Si el vector operador no es de tamanyo completo, entonces, ajustar tamanyo de vector operador B
                 std::vector<unsigned short int> ALUBopTmp;
                 if (ALUAop.size() < 8) {
@@ -427,7 +443,7 @@ namespace arqII
                 }
 
                 for (int i=0; i<numThreads; i++) {
-                    args[i].op = idex.control.ALUCtrl;
+                    args[i].op = ALUCtrl;
                     if (i==0){
                         args[i].parAV = lane1AOp;
                         args[i].parBV = lane1BOp;
@@ -463,22 +479,113 @@ namespace arqII
 
             // Flujo de senyales
             exmem.ALUOut = resultadoEX;
-            exmem.control.RegVWrite = idex.control.RegVWrite;
-            exmem.control.RegVRead = idex.control.RegVRead;
-            exmem.control.RegEWrite = idex.control.RegEWrite;
-            exmem.control.RegERead = idex.control.RegERead;
-            exmem.control.MemVWrite = idex.control.MemVWrite;
-            exmem.control.MemVRead = idex.control.MemVRead;
-            exmem.control.MemEWrite = idex.control.MemEWrite;
-            exmem.control.MemERead = idex.control.MemERead;
-            exmem.control.MuxWB = idex.control.MuxWB;
         }
+
+        isEXMEMOcupado = true;
     }
     
     void MEM(void) {
+        // Definir variables para almacenar datos del pipe anterior
+        // Datos
+        short int inm2;
+        unsigned short int DOAE;
+        std::vector<unsigned short int> DOAV;
+        // Senyales de control
+        unsigned short int MemVWrite, MemVRead, MemEWrite, MemERead;
+
+        // Flujo de datos hacia el proximo pipe
+        //Datos
+        memwb.ALUOut = exmem.ALUOut;
+        memwb.dst1 = exmem.dst1;
+        memwb.dst2 = exmem.dst2;
+        // Control
+        memwb.control.RegVWrite = exmem.control.RegVWrite;
+        memwb.control.RegEWrite = exmem.control.RegEWrite;
+
+        // Asignar datos y senyales desde pipe anterior
+        // Datos
+        inm2 = exmem.inm2;
+        DOAE = exmem.DOAE;
+        DOAV = exmem.DOAV;
+        // Control
+        MemVWrite = exmem.control.MemVWrite;
+        MemVRead = exmem.control.MemVRead;
+        MemEWrite = exmem.control.MemEWrite;
+        MemERead = exmem.control.MemERead;
+
+        isEXMEMOcupado = false;
+
+        while (isMEMWBOcupado){}
+
+        std::vector<unsigned short int> DOMemV;
+        unsigned short int DOMemE;
+
+        // Memoria vectorial
+        if (MemVWrite) {
+            // Escritura en memoria
+            memV.at(DOAE) = DOAV;
+        }
+        else if (MemVRead) {
+            // Lectura de memoria
+            DOMemV = memV.at(DOAE);
+        }
+
+        // Memoria escalar
+        if (MemERead) {
+            // Lectura en memoria
+            DOMemE = memE.at(inm2);
+        }
+
+        // Flujo de datos hacia WB
+        memwb.DOMemV = DOMemV;
+        memwb.DOMemE = DOMemE;
+
+        isMEMWBOcupado = true;
     }
 
     void WB(void) {
+        // Definir variables para almacenar datos del pipe anterior
+        // Datos
+        std::vector<unsigned short int> ALUOut, DOMemV;
+        unsigned short int DOMemE;
+        short int dst1, dst2, MuxWB;
+        // Control
+        unsigned short int RegVWrite, RegEWrite;
+
+        // Asignar datos y senyales desde pipe anterior
+        // Datos
+        ALUOut = memwb.ALUOut;
+        DOMemV = memwb.DOMemV;
+        DOMemE = memwb.DOMemE;
+        dst1 = memwb.dst1;
+        dst2 = memwb.dst2;
+        // Control
+        RegVWrite = memwb.control.RegVWrite;
+        RegEWrite = memwb.control.RegEWrite;
+        MuxWB = memwb.control.MuxWB;
+
+        isMEMWBOcupado = false;
+
+        // MUX WB
+        std::vector<unsigned short int> DatoARegV;
+        if (MuxWB == 0) {
+            // Dato desde Unidad funcional
+            DatoARegV = ALUOut;
+        }
+        else if (MuxWB == 1) {
+            // Dato desde memoria
+            DatoARegV = DOMemV;
+        }
+
+        // WB
+        if (RegVWrite) {
+            // Escritura en registro vectorial
+            bancRegsV.at(dst1) = DatoARegV;
+        }
+        if (RegEWrite) { 
+            // Escritura en registro escalar
+            bancRegsE.at(dst2) = DOMemE;
+        }
     }
 
 

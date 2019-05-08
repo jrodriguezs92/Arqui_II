@@ -114,8 +114,60 @@ template < typename T > T circular_shift_left( T number, std::size_t n )
 
 
 int main(int argc, char *argv[]) {
+    
+    
+    std::vector<std::vector<unsigned short int>> memV1;
+    std::vector<unsigned short int> data;
+    for (int i=0; i<65536; i++) {
+        memV1.push_back(data);
+    }
+    std::vector<unsigned short int> dataIn;
+    dataIn.push_back(12);
+    dataIn.push_back(22);
+    dataIn.push_back(32);
+    dataIn.push_back(42);
+    dataIn.push_back(52);
+    dataIn.push_back(62);
+    dataIn.push_back(72);
+    dataIn.push_back(82);
+    unsigned short index = 3;
+    memV1.at(index) = dataIn;
 
-    unsigned short int z = 255;
+    for (int i=0; i<dataIn.size(); i++) {
+        cout << memV1.at(index).at(i) << "    ";
+    }
+    cout << endl;
+
+    std::vector<unsigned short int> dataIn2;
+    dataIn2.push_back(1);
+    dataIn2.push_back(2);
+    dataIn2.push_back(3);
+    dataIn2.push_back(4);
+    dataIn2.push_back(5);
+    dataIn2.push_back(6);
+    dataIn2.push_back(7);
+    dataIn2.push_back(8);
+
+    memV1.at(index) = dataIn2;
+
+    for (int i=0; i<dataIn.size(); i++) {
+        cout << memV1.at(index).at(i) << "    ";
+    }
+
+    cout << endl;
+
+
+
+
+
+
+
+
+
+
+
+
+/*     unsigned short int z = 255;
 
     unsigned char a = (unsigned char) z;
 
@@ -123,7 +175,7 @@ int main(int argc, char *argv[]) {
 
     unsigned short int c = (unsigned short int) b;
 
-    cout << c << endl;
+    cout << c << endl; */
 
 
 
