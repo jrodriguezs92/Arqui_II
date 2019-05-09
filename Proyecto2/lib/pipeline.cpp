@@ -8,10 +8,14 @@
  * @Date  : 03.05.2019
  */
 
-#include "./include/pipeline.hpp"
+#include "pipeline.hpp"
 
 namespace arqII
 {
+
+//////////////////////////////////////////////////////////
+/////// IF
+//////////////////////////////////////////////////////////
 
     void IF(short int pc) {
         while (isIFIDOcupado) {}
@@ -20,6 +24,10 @@ namespace arqII
         // Desactiva paso a la nueva instruccion, para evitar conflictos
         isIFIDOcupado = true;
     }
+
+//////////////////////////////////////////////////////////
+/////// ID
+//////////////////////////////////////////////////////////
 
     void ID(void) {
         // Decodificacion de instruccion
@@ -293,6 +301,10 @@ namespace arqII
         isIDEXOcupado = true;
     }
 
+//////////////////////////////////////////////////////////
+/////// EX
+//////////////////////////////////////////////////////////
+
     void EX(void) {
         // Definir variables para almacenar datos del pipe anterior
         // Datos
@@ -484,6 +496,10 @@ namespace arqII
         isEXMEMOcupado = true;
     }
     
+//////////////////////////////////////////////////////////
+/////// MEM
+//////////////////////////////////////////////////////////
+
     void MEM(void) {
         // Definir variables para almacenar datos del pipe anterior
         // Datos
@@ -542,6 +558,10 @@ namespace arqII
 
         isMEMWBOcupado = true;
     }
+
+//////////////////////////////////////////////////////////
+/////// WB
+//////////////////////////////////////////////////////////
 
     void WB(void) {
         // Definir variables para almacenar datos del pipe anterior
@@ -621,7 +641,7 @@ namespace arqII
                         }
                     }
                     else {
-                        resultadoTmp = (arg_struct->parAV.at(i)) + (arg_struct->parBV.at[i]);
+                        resultadoTmp = (arg_struct->parAV.at(i)) + (arg_struct->parBV.at(i));
                     }
                     res.push_back(resultadoTmp);
                 }
@@ -643,7 +663,7 @@ namespace arqII
                         }
                     }
                     else {
-                        resultadoTmp = (arg_struct->parAV.at(i)) - (arg_struct->parBV.at[i]);
+                        resultadoTmp = (arg_struct->parAV.at(i)) - (arg_struct->parBV.at(i));
                     }
                     res.push_back(resultadoTmp);
                 }
