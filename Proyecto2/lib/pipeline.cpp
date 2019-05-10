@@ -672,13 +672,10 @@ namespace arqII
 
             // SHIFT CIRC DER
             case 3:
-
-
                 break;
 
             // SHIFT CIRC IZQ
             case 4:
-
                 break;
 
             // SHIFT DER

@@ -9,18 +9,27 @@
 #  */
 
 APP=pipeline
+COMPILER=comp
 Ccpp=g++
 INCLUDE=../include
 AR=ar
 OPTNS= -std=c++14
 
-all: lib$(APP).a
+all: lib$(APP).a lib$(COMPILER).a
 
 $(APP).o: $(APP).cpp
 		  $(Ccpp) $(OPTNS) -c $(APP).cpp -o $(APP).o -I$(INCLUDE)
 
+# Make pipeline.cpp
 lib$(APP).a: $(APP).o
 			 $(AR) rcs lib$(APP).a $(APP).o
+
+$(COMPILER).o: $(COMPILER).cpp
+		  $(Ccpp) $(OPTNS) -c $(COMPILER).cpp -o $(COMPILER).o -I$(INCLUDE)
+
+# Make comp.cpp
+lib$(COMPILER).a: $(COMPILER).o
+			 $(AR) rcs lib$(COMPILER).a $(COMPILER).o
 
 clean:
 		rm -f *.o

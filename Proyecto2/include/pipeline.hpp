@@ -18,6 +18,9 @@
 #include <fstream>
 #include <cmath>
 #include <thread>
+#include <cstring>
+#include <sstream>
+#include <algorithm>
 
 namespace arqII 
 {
@@ -156,6 +159,17 @@ namespace arqII
      * Ejecucion de lane
      */
     void* runLane (void*);
+
+    /**
+     * Compilacion
+     */
+    void compile (std::string);
+
+    /**
+     * Convertir un numero entero a un binario.
+     * Con un numero de bits deseado.
+     */
+    std::string decToBin(int, int);
 
 } //namespace arquiII
 #endif

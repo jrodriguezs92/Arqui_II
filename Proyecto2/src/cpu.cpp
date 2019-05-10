@@ -59,6 +59,12 @@ int main(int argc, char *argv[]) {
         // Linea leida
         std::string temp_string;
         while (getline (myfile,temp_string)) {
+
+            // Compilar linea
+            
+
+
+
             // Agregar instruccion a la memoria
             arqII::memInstr.push_back(temp_string);
         }
