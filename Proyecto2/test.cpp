@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <assert.h>
 
 #include "./include/pipeline.hpp"
 
@@ -324,9 +325,51 @@ void compile (std::string linea) {
     fs.close();
 }
 
+unsigned char rotl8b (unsigned char x, unsigned char n)
+{
+  assert (n<8);
+  return (x<<n) | (x>>(-n&7));
+}
+
+unsigned char rotr8b (unsigned char x, unsigned char n)
+{
+  assert (n<8);
+  return (x>>n) | (x<<(-n&7));
+}
+
 
 int main(int argc, char *argv[]) {
 
+/*     unsigned short int a = 255;
+    unsigned short int n = 7;
+
+    unsigned char a_c = (unsigned char) a;
+    unsigned char n_c = (unsigned char) n;
+
+    unsigned char res = rotl8b (a_c, n_c);
+
+    unsigned short int res_si = (unsigned short int) res;
+
+    cout << res_si << endl;
+
+
+    unsigned char res2 = rotr8b (res, n_c);
+
+    unsigned short int res_si2 = (unsigned short int) res2;
+
+    cout << res_si2 << endl; */
+
+
+
+
+
+
+
+
+
+
+
+/* 
     // Abre el archivo a ejecutar, con el nombre dado por el argumento argv[1]
     std::ifstream myfile;
     myfile.open(argv[1]);
@@ -347,7 +390,7 @@ int main(int argc, char *argv[]) {
         myfile.close();
     } else {
         std::cerr << "Error al abrir archivo fuente" << std::endl;
-    }
+    } */
 
 
 

@@ -27,19 +27,16 @@ int main(int argc, char *argv[]) {
     for (int i=0; i<65536; i++) {
         arqII::memV.push_back(tmpMemV);
     }
-    
     // Memoria escalar
     short int tmpMemE;
     for (int i=0; i<128; i++) {
         arqII::memE.push_back(tmpMemE);
     }
-
     // Banco de registros vectoriales
     std::vector<unsigned short int> tmpBancV;
     for (int i=0; i<16; i++) {
         arqII::bancRegsV.push_back(tmpBancV);
     }
-
     // Banco de registros escalares
     unsigned short int tmpBancE;
     for (int i=0; i<32; i++) {

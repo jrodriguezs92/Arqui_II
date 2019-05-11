@@ -672,10 +672,24 @@ namespace arqII
 
             // SHIFT CIRC DER
             case 3:
+                for (int i=0; i<arg_struct->parAV.size(); i++) {
+                    unsigned char opTmp = (unsigned char) (arg_struct->parAV.at(i));
+                    unsigned char inmTmp = (unsigned char) (arg_struct->parInm);
+                    unsigned char shNum = (opTmp>>inmTmp) | (opTmp<<(-inmTmp&7));
+                    resultadoTmp = (unsigned short int) (shNum);
+                }
+
                 break;
 
             // SHIFT CIRC IZQ
             case 4:
+                for (int i=0; i<arg_struct->parAV.size(); i++) {
+                    unsigned char opTmp = (unsigned char) (arg_struct->parAV.at(i));
+                    unsigned char inmTmp = (unsigned char) (arg_struct->parInm);
+                    unsigned char shNum = (opTmp<<inmTmp) | (opTmp>>(-inmTmp&7));
+                    resultadoTmp = (unsigned short int) (shNum);
+                }
+
                 break;
 
             // SHIFT DER
