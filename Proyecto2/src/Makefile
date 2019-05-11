@@ -12,7 +12,7 @@ APP=cpu
 Ccpp=g++
 LIBS=../lib
 INCLUDE=../include
-LINKERFLAGS=-lpipeline -lpthread
+LINKERFLAGS=-lpipeline -lpthread -lcomp
 OUT=../bin
 OPTNS= -std=c++14
 

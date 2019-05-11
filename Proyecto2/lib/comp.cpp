@@ -8,7 +8,7 @@
  * @Date  : 03.05.2019
  */
 
-#include "pipeline.hpp"
+#include "comp.hpp"
 
 namespace arqII
 {
@@ -189,6 +189,9 @@ namespace arqII
             std::string opEBin = decToBin(intValueE, 5);
             // Concatenar a instr
             instr.append(opEBin);
+
+            // Concatenar 000
+            instr.append("000");
         }
         // Tipo LE
         else if ((std::strcmp(mn, "eld")) == 0){

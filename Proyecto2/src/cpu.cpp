@@ -58,14 +58,26 @@ int main(int argc, char *argv[]) {
         while (getline (myfile,temp_string)) {
 
             // Compilar linea
-            
+            arqII::compile(temp_string);
+        }
+        myfile.close();
+    } else {
+        std::cerr << "Error al abrir archivo fuente" << std::endl;
+    }
 
+    // Abre el archivo binario
+    std::ifstream myfileBin;
+    myfileBin.open("machCode.txt");
 
+    if(myfileBin.is_open()) {
+        // Linea leida
+        std::string temp_string;
+        while (getline (myfileBin,temp_string)) {
 
             // Agregar instruccion a la memoria
             arqII::memInstr.push_back(temp_string);
         }
-        myfile.close();
+        myfileBin.close();
     } else {
         std::cerr << "Error al abrir archivo fuente" << std::endl;
     }
