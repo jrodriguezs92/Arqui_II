@@ -28,11 +28,11 @@ namespace arqII
     // Declaracion de componentes estaticos
 
     static int clk = 0;
-    std::vector<std::string> memInstr;                       // Memoria de instruciones
-    std::vector<std::vector<unsigned short int>> memV;       // Memoria de datos vectoriales
-    std::vector<short int> memE;                             // Memoria de datos escalares
-    std::vector<std::vector<unsigned short int>> bancRegsV;  // Banco de registros vectoriales
-    std::vector<unsigned short int> bancRegsE;               // Banco de registros escalares
+    extern std::vector<std::string> memInstr;                       // Memoria de instruciones
+    extern std::vector<std::vector<unsigned short int>> memV;       // Memoria de datos vectoriales
+    extern std::vector<short int> memE;                             // Memoria de datos escalares
+    extern std::vector<std::vector<unsigned short int>> bancRegsV;  // Banco de registros vectoriales
+    extern std::vector<unsigned short int> bancRegsE;               // Banco de registros escalares
     static bool isIFIDOcupado = false;                       // Evita sobreescritura sobre pipe IFID
     static bool isIDEXOcupado = false;                       // Evita sobreescritura sobre pipe IDEX
     static bool isEXMEMOcupado = false;                      // Evita sobreescritura sobre pipe EXMEM
@@ -53,7 +53,7 @@ namespace arqII
         std::string instruccion;      // Instruccion
     };
 
-    struct IFID ifid;
+    extern struct IFID ifid;
 
 
     struct IDEX {
@@ -82,7 +82,7 @@ namespace arqII
         }control;
     };
 
-    struct IDEX idex, idextmp;
+    extern struct IDEX idex;
 
 
     struct EXMEM {
@@ -105,7 +105,7 @@ namespace arqII
         }control;
     };
 
-    struct EXMEM exmem;
+    extern struct EXMEM exmem;
 
 
     struct MEMWB {
@@ -123,7 +123,7 @@ namespace arqII
         }control;
     };
 
-    struct MEMWB memwb;
+    extern struct MEMWB memwb;
 
 
     // Prototipos
@@ -159,17 +159,6 @@ namespace arqII
      * Ejecucion de lane
      */
     void* runLane (void*);
-
-    /**
-     * Compilacion
-     */
-    void compile (std::string);
-
-    /**
-     * Convertir un numero entero a un binario.
-     * Con un numero de bits deseado.
-     */
-    std::string decToBin(int, int);
 
 } //namespace arquiII
 #endif

@@ -34,5 +34,6 @@ lib$(COMPILER).a: $(COMPILER).o
 clean:
 		rm -f *.o
 		rm -f *.a
+		rm -f machCode.txt
 		
 .PHONY:clean

@@ -19,6 +19,7 @@ src: lib
 clean:
 		$(MAKE) -C lib clean
 		$(MAKE) -C src clean
+		rm -f machCode.txt
 		clear
 
 .PHONY: all lib src clean

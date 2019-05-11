@@ -1,4 +1,1 @@
 vxori v13,8
-vvadd v2,v3,v15
-vstr v5,r1
-vld v12,r4

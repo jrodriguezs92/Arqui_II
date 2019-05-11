@@ -9,6 +9,18 @@
  */
 
 #include "pipeline.hpp"
+#include "comp.hpp"
+
+std::vector<std::string> arqII::memInstr;
+std::vector<std::vector<unsigned short int>> arqII::memV;
+std::vector<short int> arqII::memE;
+std::vector<std::vector<unsigned short int>> arqII::bancRegsV;
+std::vector<unsigned short int> arqII::bancRegsE;
+
+arqII::IFID arqII::ifid;
+arqII::IDEX arqII::idex;
+arqII::EXMEM arqII::exmem;
+arqII::MEMWB arqII::memwb;
 
 int main(int argc, char *argv[]) {
 
@@ -17,8 +29,6 @@ int main(int argc, char *argv[]) {
         std::cerr << "Por favor ingrese el nombre del archivo como argumento del programa" << std::endl;
         return 0;
     }
-
-    std::cout << "Inicia.." << std::endl;
 
     // Inicializa memorias y Bancos de registros
 
@@ -80,6 +90,18 @@ int main(int argc, char *argv[]) {
         myfileBin.close();
     } else {
         std::cerr << "Error al abrir archivo fuente" << std::endl;
+    }
+
+    // Ejecucion
+
+    std::cout << "Inicia.." << std::endl;
+
+    for (short int i=0; i<arqII::memInstr.size(); i++) {
+
+        // IF
+        std::cout << "IF/ID" << std::endl;
+        arqII::IF(i);
+        std::cout << "SIGNALS:" << std::endl << arqII::ifid.instruccion << std::endl;
     }
 
     std::cout << "Termina.." << std::endl;
