@@ -1,1 +1,12 @@
 vxori v13,8
+vvadd v12,v13,v14
+vvsub v15,v12,v14
+veshrc v15,5
+veshlc v15,5
+veshr v15,2
+veshl v15,5
+vvaddi v15,65
+vvsubi v15,65
+eld r1,0
+vstr v15,r1
+vld v0,r1

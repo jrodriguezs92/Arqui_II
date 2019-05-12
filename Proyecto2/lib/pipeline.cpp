@@ -221,7 +221,7 @@ namespace arqII
                 idex.control.MemERead = 1;
                 idex.control.MuxABancRegV = -1;
                 idex.control.MuxBALU = -1;
-                idex.control.MuxWB = -1;
+                idex.control.MuxWB = 1;
                 idex.control.ALUCtrl = -1;
 
                 break;
@@ -412,11 +412,19 @@ namespace arqII
                 // Esperar a que los hilos terminen de ejecutar los lane
                 for (int i = 0; i < numThreads; i++) {
                     pthread_join(tids[i], NULL);
-
-                    // Unir resultados
-                    for (int index=0; index<args[i].resultado.size(); index++){
-                        resultadoEX.push_back(args[i].resultado.at(index));
+                }
+                // Unir resultados
+                int resindex = 0;
+                while (resindex < 2) {
+                    for (int i=0; i<numThreads; i++){
+                        if ((args[i].resultado.size() == 1) && resindex == 1){
+                            break;
+                        }
+                        else {
+                            resultadoEX.push_back(args[i].resultado.at(resindex));
+                        }
                     }
+                    resindex++;
                 }
             }
             // Ejecucion para operaciones vector-vector
@@ -427,6 +435,9 @@ namespace arqII
                     for (int i=0; i<ALUAop.size(); i++) {
                         ALUBopTmp.push_back(ALUBop.at(i));
                     }
+                }
+                else {
+                    ALUBopTmp = ALUBop;
                 }
 
                 // Definir vectores para separar ejecucion
@@ -483,11 +494,19 @@ namespace arqII
                 // Esperar a que los hilos terminen de ejecutar los lane
                 for (int i = 0; i < numThreads; i++) {
                     pthread_join(tids[i], NULL);
-
-                    // Unir resultados
-                    for (int index=0; index<args[i].resultado.size(); index++){
-                        resultadoEX.push_back(args[i].resultado.at(index));
+                }
+                // Unir resultados
+                int resindex = 0;
+                while (resindex < 2) {
+                    for (int i=0; i<numThreads; i++){
+                        if ((args[i].resultado.size() == 1) && resindex == 1){
+                            break;
+                        }
+                        else {
+                            resultadoEX.push_back(args[i].resultado.at(resindex));
+                        }
                     }
+                    resindex++;
                 }
             }
 
@@ -519,6 +538,7 @@ namespace arqII
         // Control
         memwb.control.RegVWrite = exmem.control.RegVWrite;
         memwb.control.RegEWrite = exmem.control.RegEWrite;
+        memwb.control.MuxWB = exmem.control.MuxWB;
 
         // Asignar datos y senyales desde pipe anterior
         // Datos
@@ -633,7 +653,7 @@ namespace arqII
                 for (int i=0; i<arg_struct->parAV.size(); i++) {
                     if (((arg_struct->parAV.at(i)) + (arg_struct->parBV.at(i))) > 255) {
                         resultadoTmp = arg_struct->parAV.at(i);
-                        for (int j = arg_struct->parInm; j>0; j--) {
+                        for (int j = arg_struct->parBV.at(i); j>0; j--) {
                             if ((resultadoTmp+1) > 255) {
                                 resultadoTmp = 0;
                             }
@@ -655,7 +675,7 @@ namespace arqII
                 for (int i=0; i<arg_struct->parAV.size(); i++) {
                     if (((arg_struct->parAV.at(i)) - (arg_struct->parBV.at(i))) < 0) {
                         resultadoTmp = arg_struct->parAV.at(i);
-                        for (int j = arg_struct->parInm; j>0; j--) {
+                        for (int j = arg_struct->parBV.at(i); j>0; j--) {
                             if ((resultadoTmp-1) < 0) {
                                 resultadoTmp = 255;
                             }
@@ -679,6 +699,7 @@ namespace arqII
                     unsigned char inmTmp = (unsigned char) (arg_struct->parInm);
                     unsigned char shNum = (opTmp>>inmTmp) | (opTmp<<(-inmTmp&7));
                     resultadoTmp = (unsigned short int) (shNum);
+                    res.push_back(resultadoTmp);
                 }
 
                 break;
@@ -690,6 +711,7 @@ namespace arqII
                     unsigned char inmTmp = (unsigned char) (arg_struct->parInm);
                     unsigned char shNum = (opTmp<<inmTmp) | (opTmp>>(-inmTmp&7));
                     resultadoTmp = (unsigned short int) (shNum);
+                    res.push_back(resultadoTmp);
                 }
 
                 break;
@@ -698,8 +720,9 @@ namespace arqII
             case 5:
                 for (int i=0; i<arg_struct->parAV.size(); i++) {
                     unsigned char opTmp = (unsigned char) (arg_struct->parAV.at(i));
-                    unsigned char shNum = opTmp >> (arg_struct->parInm);
-                    resultadoTmp = (unsigned short int) (shNum);
+                    unsigned char shNum = opTmp>>arg_struct->parInm;
+                    resultadoTmp = (unsigned short int) shNum;
+                    res.push_back(resultadoTmp);
                 }
 
                 break;
@@ -708,8 +731,9 @@ namespace arqII
             case 6:
                 for (int i=0; i<arg_struct->parAV.size(); i++) {
                     unsigned char opTmp = (unsigned char) (arg_struct->parAV.at(i));
-                    unsigned char shNum = opTmp << (arg_struct->parInm);
-                    resultadoTmp = (unsigned short int) (shNum);
+                    unsigned char shNum = opTmp<<arg_struct->parInm;
+                    resultadoTmp = (unsigned short int) shNum;
+                    res.push_back(resultadoTmp);
                 }
 
                 break;
@@ -717,18 +741,63 @@ namespace arqII
             // SUMA INM
             case 7:
                 for (int i=0; i<arg_struct->parAV.size(); i++) {
-                    resultadoTmp = (arg_struct->parAV.at(i)) + (arg_struct->parInm);
+                    if (((arg_struct->parAV.at(i)) + (arg_struct->parInm)) > 255) {
+                        resultadoTmp = arg_struct->parAV.at(i);
+                        for (int j = arg_struct->parInm; j>0; j--) {
+                            if ((resultadoTmp+1) > 255) {
+                                resultadoTmp = 0;
+                            }
+                            else {
+                                resultadoTmp++;
+                            }
+                        }
+                    }
+                    else {
+                        resultadoTmp = (arg_struct->parAV.at(i)) + (arg_struct->parInm);
+                    }
                     res.push_back(resultadoTmp);
                 }
+
+
+
+
+
+                // for (int i=0; i<arg_struct->parAV.size(); i++) {
+                //     resultadoTmp = (arg_struct->parAV.at(i)) + (arg_struct->parInm);
+                //     res.push_back(resultadoTmp);
+                // }
 
                 break;
 
             // RESTA INM
             case 8:
+
                 for (int i=0; i<arg_struct->parAV.size(); i++) {
-                    resultadoTmp = (arg_struct->parAV.at(i)) - (arg_struct->parInm);
+                    if (((arg_struct->parAV.at(i)) - (arg_struct->parInm)) < 0) {
+                        resultadoTmp = arg_struct->parAV.at(i);
+                        for (int j = arg_struct->parInm; j>0; j--) {
+                            if ((resultadoTmp-1) < 0) {
+                                resultadoTmp = 255;
+                            }
+                            else {
+                                resultadoTmp--;
+                            }
+                        }
+                    }
+                    else {
+                        resultadoTmp = (arg_struct->parAV.at(i)) - (arg_struct->parInm);
+                    }
                     res.push_back(resultadoTmp);
                 }
+
+
+
+
+
+                // for (int i=0; i<arg_struct->parAV.size(); i++) {
+                //     resultadoTmp = (arg_struct->parAV.at(i)) - (arg_struct->parInm);
+                //     res.push_back(resultadoTmp);
+                // }
 
                 break;
         }

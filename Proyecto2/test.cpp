@@ -454,15 +454,17 @@ int main(int argc, char *argv[]) {
 
 
 
-/*     unsigned short int z = 255;
+     unsigned short int z = 5;
 
     unsigned char a = (unsigned char) z;
 
-    unsigned char b = a << 3;
+    short int k = 3;
+
+    unsigned char b = a << k;
 
     unsigned short int c = (unsigned short int) b;
 
-    cout << c << endl; */
+    cout << c << endl;
 
 
 

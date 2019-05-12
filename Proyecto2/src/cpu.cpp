@@ -108,6 +108,20 @@ int main(int argc, char *argv[]) {
     v1.push_back(19);
     arqII::bancRegsV.at(13) = v1;
 
+    std::vector<unsigned short int> v2;
+    v2.push_back(1);
+    v2.push_back(2);
+    v2.push_back(3);
+    v2.push_back(4);
+    v2.push_back(5);
+    v2.push_back(6);
+    v2.push_back(7);
+    v2.push_back(8);
+    arqII::bancRegsV.at(14) = v2;
+
+    short int esc = 2;
+    arqII::memE.at(0) = esc;
+
     for (short int i=0; i<arqII::memInstr.size(); i++) {
         std::cout << "-------- INSTRUCCION " << i << "--------" << std::endl;
 
