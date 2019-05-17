@@ -31,7 +31,7 @@ void vecMul(int *A,int *B,int *C,int N){
 int main(int argc,char **argv)
 {
     printf("Begin \n");
-    int n=16;
+    int n=4;
     int size  = n*n;
 
     //Number of blocks
@@ -46,7 +46,7 @@ int main(int argc,char **argv)
     c2 = (int *) malloc(nBytes);
 
     int *a_d,*b_d,*c_d;
-    block_size = 250; //threads per block
+    block_size = 16; //threads per block
     block_no = size/block_size;
     
     //Work definition
